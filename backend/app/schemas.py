@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -6,16 +6,11 @@ class UserCreate(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     email: EmailStr
     password: str = Field(min_length=6, max_length=100)
-    role: str = "passenger"
+    role: str = Field(default="passenger")
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    user: "UserOut"
 
 class UserOut(BaseModel):
     id: int
@@ -24,31 +19,42 @@ class UserOut(BaseModel):
     role: str
     model_config = ConfigDict(from_attributes=True)
 
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut
+
 class LostItemCreate(BaseModel):
-    item_type: str
-    brand: Optional[str] = None
-    color: Optional[str] = None
-    bus_number: Optional[str] = None
-    lost_date: Optional[date] = None
-    description: str
+    item_name: str = Field(min_length=1, max_length=120)
+    category: str = Field(min_length=1, max_length=80)
+    color: str = Field(min_length=1, max_length=50)
+    route: str = Field(min_length=1, max_length=100)
+    bus_time: Optional[str] = None
+    lost_date: date
+    description: str = Field(min_length=3)
+    reporter_name: str = Field(min_length=2, max_length=120)
+    phone: str = Field(min_length=7, max_length=30)
 
 class LostItemOut(LostItemCreate):
     id: int
-    user_id: Optional[int]
+    user_id: int
     status: str
     model_config = ConfigDict(from_attributes=True)
 
 class FoundItemCreate(BaseModel):
-    item_type: str
-    brand: Optional[str] = None
-    color: Optional[str] = None
-    bus_number: Optional[str] = None
-    found_date: Optional[date] = None
-    description: str
+    item_name: str = Field(min_length=1, max_length=120)
+    category: str = Field(min_length=1, max_length=80)
+    color: str = Field(min_length=1, max_length=50)
+    route: str = Field(min_length=1, max_length=100)
+    bus_time: Optional[str] = None
+    found_date: date
+    description: str = Field(min_length=3)
+    reporter_name: str = Field(min_length=2, max_length=120)
+    phone: str = Field(min_length=7, max_length=30)
 
 class FoundItemOut(FoundItemCreate):
     id: int
-    user_id: Optional[int]
+    user_id: int
     status: str
     model_config = ConfigDict(from_attributes=True)
 
@@ -58,6 +64,7 @@ class MatchOut(BaseModel):
     found_item_id: int
     score: float
     status: str
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 class MatchStatusUpdate(BaseModel):

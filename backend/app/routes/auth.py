@@ -13,15 +13,8 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(400, "Invalid role")
     if db.query(User).filter(User.email == data.email).first():
         raise HTTPException(409, "Email already registered")
-    user = User(
-        name=data.name,
-        email=data.email,
-        password_hash=hash_password(data.password),
-        role=data.role,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    user = User(name=data.name, email=data.email, password_hash=hash_password(data.password), role=data.role)
+    db.add(user); db.commit(); db.refresh(user)
     return user
 
 @router.post("/login", response_model=TokenResponse)

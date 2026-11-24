@@ -9,9 +9,13 @@ import MatchCenter from './pages/MatchCenter'
 import Notifications from './pages/Notifications'
 import Handover from './pages/Handover'
 import History from './pages/History'
+import Login from './pages/Login'
+import { useApp } from './context/AppContext'
 
 function Shell() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { isAuthenticated } = useApp()
+  if (!isAuthenticated) return <Login />
   return <div className="app-shell">
     <div className={`sidebar-scrim ${menuOpen ? 'show' : ''}`} onClick={() => setMenuOpen(false)}/>
     <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)}/>
