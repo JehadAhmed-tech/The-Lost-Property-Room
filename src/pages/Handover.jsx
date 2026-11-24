@@ -1,0 +1,19 @@
+import { useApp } from '../context/AppContext'
+import { Handshake, CheckCircle2, Phone, ShieldCheck } from 'lucide-react'
+import StatusBadge from '../components/StatusBadge'
+import EmptyState from '../components/EmptyState'
+import toast from 'react-hot-toast'
+
+export default function Handover() {
+  const { matches, lostReports, foundReports, markReturned } = useApp()
+  const confirmed = matches.filter(m => m.status === 'Confirmed')
+  const returned = foundReports.filter(r => r.status === 'Returned')
+  const finish = id => { markReturned(id); toast.success('Item marked as returned') }
+  return <div className="page-content"><div className="page-toolbar"><div><span className="eyebrow">SAFE RETURN PROCESS</span><h2>Handover management</h2><p>Record the return only after the item is physically handed to its verified owner.</p></div><div className="handover-count"><Handshake size={18}/>{confirmed.length} ready for handover</div></div>
+    <div className="review-rule"><ShieldCheck size={19}/><div><strong>Identity and ownership check</strong><p>Contact the claimant using the report details. Verify identifying details and record the handover only after Mr. Alam approves it.</p></div></div>
+    <h3 className="subsection-title">Confirmed matches</h3>
+    {confirmed.length ? <div className="handover-grid">{confirmed.map(m => { const owner = lostReports.find(r => r.id === m.lostId); const item = foundReports.find(r => r.id === m.foundId); return <article className="panel handover-card" key={m.id}><div className="handover-card-top"><div className="handover-icon"><Handshake size={20}/></div><StatusBadge status="Confirmed"/></div><h3>{m.lostItem}</h3><p>Found record: {m.foundItem}</p><div className="owner-detail"><strong>{owner?.reporterName || 'Owner details unavailable'}</strong><span><Phone size={13}/>{owner?.phone || 'No phone recorded'}</span></div><div className="handover-warning">Confirm the claimant's identity in person before completing this step.</div><button className="btn btn-primary full-btn" disabled={!item || item.status === 'Returned'} onClick={() => finish(m.foundId)}><CheckCircle2 size={16}/> Mark as returned</button></article> })}</div> : <EmptyState title="No items ready for handover" text="Only manager-confirmed matches appear here."/>}
+    <h3 className="subsection-title space-top">Recently returned</h3>
+    <section className="panel simple-list">{returned.length ? returned.map(r => <div className="simple-row" key={r.id}><div><strong>{r.itemName}</strong><small>{r.id} · {r.reporterName}</small></div><StatusBadge status="Returned"/></div>) : <EmptyState title="No completed handovers" text="Completed returns will be listed here."/>}</section>
+  </div>
+}
