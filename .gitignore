@@ -1,6 +1,4 @@
-node_modules/
-backend/
-__pycache__/
-*.pyc
 .env
-dist/
+*.pyc
+__pycache__/
+*.zip
